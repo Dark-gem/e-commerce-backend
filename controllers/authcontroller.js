@@ -36,7 +36,7 @@ export const login = async (req, res) => {
     const isMatch = await user.comparePassword(password);
 
     if (!isMatch)
-      return res.status(400).json({ message: "INvalid Email or Password" });
+      return res.status(400).json({ message: "Invalid Email or Password" });
     const accesstoken = generateacesstoken(user._id);
     const refreshtoken = genteraterefreshtoken(user._id);
 
