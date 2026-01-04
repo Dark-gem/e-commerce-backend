@@ -37,8 +37,8 @@ export const login = async (req, res) => {
 
     if (!isMatch)
       return res.status(400).json({ message: "INvalid Email or Password" });
-    const accesstoken = generateAcessToken(user);
-    const refreshtoken = genterateRefreshToken(user);
+    const accesstoken = generateacesstoken(user._id);
+    const refreshtoken = genteraterefreshtoken(user._id);
 
     // res.token("acesstoken", accesstoken, {
     //   http: true,
