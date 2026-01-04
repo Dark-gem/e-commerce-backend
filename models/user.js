@@ -15,11 +15,16 @@ const userschema = new mongoose.Schema({
     require: true,
     select: false,
   },
+  role: {
+    type: String,
+    enum: ["user", "admin"],
+    default: "user",
+  },
 });
 userschema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 10);
-  next();
+  next;
 });
 userschema.methods.comparePassword = function (candidate) {
   return bcrypt.compare(candidate, this.password);

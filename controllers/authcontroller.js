@@ -1,13 +1,13 @@
 import jwt from "jsonwebtoken";
 import { User } from "../models/user.js";
 
-const generateacesstoken = (userID) => {
-  return jwt.sign({ id: userID }, process.env.JWT_SECRET, {
+const generateAcessToken = (user) => {
+  return jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
     expiresIn: "7d",
   });
 };
-const genteraterefreshtoken = (userID) => {
-  return jwt.sign({ id: userID }, process.env.JWT_SECRET, {
+const genterateRefreshToken = (user) => {
+  return jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
     expiresIn: "7d",
   });
 };
@@ -16,7 +16,7 @@ export const register = async (req, res) => {
     const { name, email, password } = req.body;
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(404).json({ message: "User already exists" });
+      return res.status(400).json({ message: "User already exists" });
     }
     const user = await User.create({ name, email, password });
     res.json({ message: "User registered sucessfully", user });
@@ -37,8 +37,8 @@ export const login = async (req, res) => {
 
     if (!isMatch)
       return res.status(400).json({ message: "INvalid Email or Password" });
-    const accesstoken = generateacesstoken(user._id);
-    const refreshtoken = genteraterefreshtoken(user._id);
+    const accesstoken = generateAcessToken(user);
+    const refreshtoken = genterateRefreshToken(user);
 
     // res.token("acesstoken", accesstoken, {
     //   http: true,

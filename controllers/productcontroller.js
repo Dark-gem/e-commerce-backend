@@ -56,23 +56,55 @@ export const updateProduct = async (req, res) => {
 export const searchProduct = async (req, res) => {
   try {
     const { q } = req.query;
+
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
     if (!q) {
       return res.status(400).json({ message: "Search query is required" });
     }
-    const products = await Product.find({
+
+    const filter = {
       $or: [
         { name: { $regex: q, $options: "i" } },
         { category: { $regex: q, $options: "i" } },
       ],
-    });
+    };
+
+    const products = await Product.find(filter).skip(skip).limit(limit);
+
+    const total = await Product.countDocuments(filter);
 
     res.status(200).json({
       message: "Products found",
-      count: products.length,
+      page,
+      totalPages: Math.ceil(total / limit),
+      totalProducts: total,
       products,
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: "Server not found" });
+    res.status(500).json({ message: "Server error" });
+  }
+};
+export const getAllProducts = async (req, res) => {
+  try {
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const products = await Product.find().skip(skip).limit(limit);
+
+    const total = await Product.countDocuments();
+
+    res.status(200).json({
+      page,
+      totalPages: Math.ceil(total / limit),
+      totalProducts: total,
+      products,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
   }
 };
